@@ -58,7 +58,7 @@ if __name__ == "__main__":
     
     try:
         main( sys.argv[1] )
-    except KeyError:
+    except IndexError:
         try:
             main("config.yaml")
         except FileNotFoundError:
