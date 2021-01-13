@@ -8,6 +8,7 @@ Created on Mon Jan 11 17:28:15 2021
 """
 import numpy
 import pandas
+import os
 import time
 import sys
 from GaussianEmulator import GaussianEmulator
@@ -44,6 +45,9 @@ class CloudEmulatorInterface(GaussianEmulator):
         numpy.savetxt( self.configFile["predictionOutputFile"], self.predictions )
 
 def main(file):
+    
+    assert( os.path.isfile(file))
+    
     emulator = CloudEmulatorInterface( file )
     
     emulator.main()
@@ -56,13 +60,12 @@ def main(file):
 if __name__ == "__main__":
     start = time.time()
     
-    try:
-        main( sys.argv[1] )
-    except KeyError:
-        try:
-            main("config.yaml")
-        except FileNotFoundError:
-            print("input file missing and not given")
-    main()
+    if len(sys.argv >= 2):
+        file = sys.argv[1]
+    else:
+        file = "config.yaml"
+    
+    main( file )
+    
     end = time.time()
     print(f"\nEmulator completed in { end - start : .1f} seconds")
