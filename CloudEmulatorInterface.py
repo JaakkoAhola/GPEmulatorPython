@@ -59,7 +59,10 @@ if __name__ == "__main__":
     try:
         main( sys.argv[1] )
     except KeyError:
-        print("input file missing")
+        try:
+            main("config.yaml")
+        except FileNotFoundError:
+            print("input file missing and not given")
     main()
     end = time.time()
     print(f"\nEmulator completed in { end - start : .1f} seconds")
