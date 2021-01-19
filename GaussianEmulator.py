@@ -73,7 +73,9 @@ class GaussianEmulator:
     
     def predictEmulator(self, predictionMatrix):
         
-        predictions = self.gp.predict(predictionMatrix, return_std=False)
+        predictionMatrixScaled = self.scaler.transform(predictionMatrix)
+        
+        predictions = self.gp.predict(predictionMatrixScaled, return_std=False)
         self.predictions = self.scaler_out_gp.inverse_transform( predictions )
         
     def getPredictions(self):
