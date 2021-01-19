@@ -6,7 +6,7 @@ Created on Mon Dec 21 15:41:10 2020
 @author: Jaakko Ahola, Finnish Meteorological Institute
 @licence: MIT licence Copyright
 """
-print(__doc__)
+
 import numpy
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, WhiteKernel
@@ -73,7 +73,9 @@ class GaussianEmulator:
     
     def predictEmulator(self, predictionMatrix):
         
-        predictions = self.gp.predict(predictionMatrix, return_std=False)
+        predictionMatrixScaled = self.scaler.transform(predictionMatrix)
+        
+        predictions = self.gp.predict(predictionMatrixScaled, return_std=False)
         self.predictions = self.scaler_out_gp.inverse_transform( predictions )
         
     def getPredictions(self):
