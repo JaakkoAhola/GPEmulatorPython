@@ -15,7 +15,7 @@ from scipy.optimize import minimize
 
 class GaussianEmulator:
     
-    def __init__(self, trainingData, maxiter = 10000, n_restarts_optimizer=10, boundOrdo = 1e12):
+    def __init__(self, trainingData, maxiter = 10000, n_restarts_optimizer=10, boundOrdo = [1e-12,1e12]):
         # Standardize inputs and outputs
         # NOTE! GP must have standardized values always!
         # GP output standardization is hardcoded, input not but it would be strange to not have it on...
@@ -34,7 +34,7 @@ class GaussianEmulator:
         
         self.n_restarts_optimizer = n_restarts_optimizer
         
-        self.boundOrdo = boundOrdo
+        self.boundOrdo = tuple(boundOrdo)
     
     def optimizer(self, obj_func, initial_theta, bounds = None):
         opt_res = minimize(obj_func, initial_theta, method = "L-BFGS-B", options = { "maxiter" :self.maxiter}, bounds = bounds, jac = True )
@@ -73,9 +73,9 @@ class GaussianEmulator:
     def setDefaultKernel(self):
         
         self.__checkTheta()
-        self.kernel = C(0.9010, (1e-12, 1e12)) \
-                        + RBF(self.theta, (1/self.boundOrdo, self.boundOrdo)) \
-                        + WhiteKernel(noise_level=0.346, noise_level_bounds=(1e-12, 1e+12))
+        self.kernel = C(0.9010, self.boundOrdo) \
+                        + RBF(self.theta, self.boundOrdo) \
+                        + WhiteKernel(noise_level=0.346, noise_level_bounds=self.boundOrdo)
                         
     def setKernel(self, kernel):
         self.kernel = kernel
