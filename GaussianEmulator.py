@@ -15,18 +15,16 @@ from scipy.optimize import minimize
 
 class GaussianEmulator:
     
-    def __init__(self, trainingData, maxiter = 10000, n_restarts_optimizer=10, boundOrdo = [1e-12,1e12]):
+    def __init__(self, inputs, target, maxiter = 10000, n_restarts_optimizer=10, boundOrdo = [1e-12,1e12]):
         # Standardize inputs and outputs
         # NOTE! GP must have standardized values always!
         # GP output standardization is hardcoded, input not but it would be strange to not have it on...
         
         # Original LES data used for training
-        self.inputMatrix = trainingData[:, :-2]
+        self.inputMatrix = inputs
         # Change rainrate units to match satellite rainrate
-        self.targetMatrix = trainingData[:, -1]
-        
+        self.targetMatrix = target
         self.numberOfInputVariables = self.inputMatrix.shape[1]
-        
         
         self.theta = numpy.array([0.9650, 0.6729, 3.5576, 4.7418, 1.2722, 4.0612, 0.5, 2.4, 4.3, 3.2, 1.5, 0.5, 2.4, 4.3, 3.2])[: self.numberOfInputVariables ]
         
@@ -66,7 +64,7 @@ class GaussianEmulator:
         self.inputMatrix = self.scaler.transform(self.inputMatrix)
     
         self.scaler_out = StandardScaler().fit(self.targetMatrix.reshape(-1, 1))
-        self.targetMatrix = self.scaler_out.transform(self.targetMatrix[:, None])
+        self.targetMatrix = self.scaler_out.transform(self.targetMatrix.reshape(-1,1))
 
         self.scaler_out_gp = self.scaler_out
         
@@ -88,6 +86,22 @@ class GaussianEmulator:
                                            optimizer = self.optimizer )
         self.gp.fit(self.inputMatrix, self.targetMatrix)
     
+    def getEmulator(self):
+        return self.gp
+    
+    def getScaledPredictionMatrix(self, predictionMatrix):
+        predictionMatrixScaled = self.scaler.transform(predictionMatrix)
+        
+        return predictionMatrixScaled
+    
+    def getScaledTargetMatrix(self, targetMatrix):
+        targetScaled = self.scaler_out.transform( targetMatrix )
+        
+        return targetScaled
+        
+    def getNonScaledPredictions(self, predictions):
+        return self.scaler_out_gp.inverse_transform( predictions )
+        
     def predictEmulator(self, predictionMatrix):
         
         predictionMatrixScaled = self.scaler.transform(predictionMatrix)

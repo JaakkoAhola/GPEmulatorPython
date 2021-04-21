@@ -16,9 +16,11 @@ from GaussianEmulator import GaussianEmulator
 
 class LeaveOneOut:
 
-    def loopLeaveOneOut(matrix, indexName, optimization = {"maxiter": 30000, "n_restarts_optimizer" : 10}, boundOrdo = [1e-3, 1e12] ):
+    def loopLeaveOneOut(matrix, indexName, optimization = {"maxiter": 30000, "n_restarts_optimizer" : 10}, boundOrdo = [1e-12, 1e3] ):
         train = matrix.drop(indexName).values
-        emulator = GaussianEmulator(train,
+        inputs = train[:, :-1]
+        target = train[:, -1]
+        emulator = GaussianEmulator(inputs, target,
                                     maxiter = optimization["maxiter"],
                                     n_restarts_optimizer = optimization["n_restarts_optimizer"],
                                     boundOrdo = boundOrdo)
