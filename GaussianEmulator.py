@@ -81,9 +81,10 @@ class GaussianEmulator:
     def trainEmulator(self):
         self.gp = GaussianProcessRegressor( kernel=self.kernel,
                                            n_restarts_optimizer=self.n_restarts_optimizer,
-                                           alpha=0,
+                                           alpha=1e-10,
                                            normalize_y=False,
-                                           optimizer = self.optimizer )
+                                           optimizer = self.optimizer,
+                                           random_state = 0)
         self.gp.fit(self.inputMatrix, self.targetMatrix)
     
     def getEmulator(self):
